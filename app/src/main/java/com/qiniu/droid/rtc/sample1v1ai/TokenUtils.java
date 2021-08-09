@@ -10,9 +10,10 @@ public class TokenUtils {
 
     private static final String ENCODING = "UTF-8";
 
-    static String appKey = "";
-    static String appId = "";
-    static String appSecretKey = "";
+    static String appKey = "bsOUqUaLN-cJ3DlmdD6jU8B7_Nq5fo6IDZVAhtLe";
+    static String appId = "testApp";
+    static String appSecretKey = "B8IUczRc8wlbttCxesVLzS0pEWZ_aKEQ63Cz9CzR";
+
 
     public static String resetToken() {
 
