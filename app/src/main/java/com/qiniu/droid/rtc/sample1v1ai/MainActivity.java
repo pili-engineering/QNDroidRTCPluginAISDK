@@ -15,8 +15,10 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int QRCODE_RESULT_REQUEST_CODE = 1;
     private EditText mRoomTokenEditText;
-    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:IjZQk1oD46GxXma6lpZ0KNi5x8Q=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsInJvb21OYW1lIjoiMjM0cyIsInVzZXJJZCI6InNzYWRzYWQiLCJleHBpcmVBdCI6MTYzMDA2MjEwNSwicGVybWlzc2lvbiI6InVzZXIifQ==";
-    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:KhqM2SKquI0_eoYI0r7dlOffwV8=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsInJvb21OYW1lIjoiMjM0cyIsInVzZXJJZCI6ImFzZHNhMiIsImV4cGlyZUF0IjoxNjIzOTI3NzI2LCJwZXJtaXNzaW9uIjoidXNlciJ9";
+    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:srRQTXJzBogXrXVMq-FUSOdER3c=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjYxNTcxNzAzLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzIiwidXNlcklkIjoiMTIzMzMifQ==";
+    //debug "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:HX9jtooyqlqyq0iN9ERM2H-i1S0=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjI3NzA0NDA0LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzNCIsInVzZXJJZCI6ImFkc2FkYWRhZCJ9"
+    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:yvaLyhyuhN54013ESzodkpxJ0BI=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjYxNTcxNzAzLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzIiwidXNlcklkIjoiMTJlcWUifQ==";
+    // "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:9ifJL3qnKSTAwuA1iPmDuOgnkRY=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjI3NzA0NDYwLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzNCIsInVzZXJJZCI6ImFkc2Fkc2Fkc2EifQ=="
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

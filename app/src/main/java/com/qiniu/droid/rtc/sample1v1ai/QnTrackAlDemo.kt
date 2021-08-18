@@ -190,6 +190,7 @@ class QnTrackAlDemo : Fragment() {
             QNTextToSpeakAnalyzer.run(QNTTSParam().apply {
                 text = etText
                 audioEncoding = QNAudioEncoding.MP3
+                volume = 100
             }
             ) {
                 tvText.text = "文转音：${it.errorCode} ${it.errorMsg}"

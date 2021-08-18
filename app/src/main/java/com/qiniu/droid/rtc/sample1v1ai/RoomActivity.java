@@ -2,15 +2,19 @@ package com.qiniu.droid.rtc.sample1v1ai;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.Environment;
 import android.util.Log;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentTransaction;
 
+import com.qiniu.droid.rtc.QNCustomMessage;
+import com.qiniu.droid.rtc.QNAudioFrame;
+import com.qiniu.droid.rtc.QNAudioFrameListener;
 import com.qiniu.droid.rtc.QNCameraSwitchResultCallback;
 import com.qiniu.droid.rtc.QNCameraVideoTrackConfig;
 import com.qiniu.droid.rtc.QNClientEventListener;
@@ -20,14 +24,20 @@ import com.qiniu.droid.rtc.QNMicrophoneAudioTrackConfig;
 import com.qiniu.droid.rtc.QNPublishResultCallback;
 import com.qiniu.droid.rtc.QNRTC;
 import com.qiniu.droid.rtc.QNRTCClient;
+import com.qiniu.droid.rtc.QNRTCEngine;
 import com.qiniu.droid.rtc.QNRTCEventListener;
 import com.qiniu.droid.rtc.QNRTCSetting;
-import com.qiniu.droid.rtc.QNScreenVideoTrackConfig;
 import com.qiniu.droid.rtc.QNSurfaceView;
 import com.qiniu.droid.rtc.QNTrack;
 import com.qiniu.droid.rtc.QNVideoFormat;
 import com.qiniu.droid.rtc.model.QNAudioDevice;
 
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.util.List;
 
 public class RoomActivity extends AppCompatActivity implements QNRTCEventListener, QNClientEventListener {
@@ -37,6 +47,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
     private QNSurfaceView mLocalVideoSurfaceView;
     private QNSurfaceView mRemoteVideoSurfaceView;
+    private QNRTCSetting mSetting;
     private QNRTCClient mClient;
     private String mRoomToken;
 
@@ -50,6 +61,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_room);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         mLocalVideoSurfaceView = findViewById(R.id.local_video_surface_view);
         mRemoteVideoSurfaceView = findViewById(R.id.remote_video_surface_view);
@@ -58,22 +70,22 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         Intent intent = getIntent();
         mRoomToken = intent.getStringExtra("roomToken");
 
-        QNRTCSetting setting = new QNRTCSetting();
+        mSetting = new QNRTCSetting();
 
         // 配置默认摄像头 ID，此处配置为前置摄像头
-        setting.setCameraID(QNRTCSetting.QNCameraFacing.FRONT);
+        mSetting.setCameraID(QNRTCSetting.QNCameraFacing.FRONT);
 
         // 相机预览分辨率、帧率配置为 640x480、20fps
-        setting.setCameraPreviewFormat(new QNVideoFormat(640, 480, 30));
+        mSetting.setCameraPreviewFormat(new QNVideoFormat(640, 480, 30));
 
         // 初始化 QNRTC
-        QNRTC.init(getApplicationContext(), setting, this);
+        QNRTC.init(getApplicationContext(), mSetting, this);
 
         // 创建本地 Camera 采集 track
         if (mLocalVideoTrack == null) {
             QNCameraVideoTrackConfig cameraVideoTrackConfig = new QNCameraVideoTrackConfig(TAG_CAMERA)
                     .setVideoEncodeFormat(new QNVideoFormat(640, 480, 30))
-                    .setBitrate(1200 * 1000);
+                    .setBitrate(1200);
             mLocalVideoTrack = QNRTC.createCameraVideoTrack(cameraVideoTrackConfig);
         }
         // 设置预览窗口
@@ -82,7 +94,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         // 创建本地音频采集 track
         if (mLocalAudioTrack == null) {
             QNMicrophoneAudioTrackConfig microphoneAudioTrackConfig = new QNMicrophoneAudioTrackConfig(TAG_MICROPHONE)
-                    .setBitrate(100 * 1000);
+                    .setBitrate(100);
             mLocalAudioTrack = QNRTC.createMicrophoneAudioTrack(microphoneAudioTrackConfig);
         }
 
@@ -125,6 +137,9 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         FragmentTransaction transaction = getSupportFragmentManager().beginTransaction();
         transaction.replace(R.id.flCover, flCover);
         transaction.commit();
+
+        QNTrack track = QNRTC.createCustomAudioTrack();
+
     }
 
     @Override
@@ -137,7 +152,6 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
     /**
      * 房间状态改变时会回调此方法
      * 房间状态回调只需要做提示用户，或者更新相关 UI； 不需要再做加入房间或者重新发布等其他操作！
-     *
      * @param state 房间状态，可参考 {@link QNConnectionState}
      */
     @Override
@@ -176,10 +190,10 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
     /**
      * 远端用户加入房间时会回调此方法
+     * @see QNRTCClient#join(String, String, QNJoinResultCallback) 可指定 userData 字段
      *
      * @param remoteUserId 远端用户的 userId
-     * @param userData     透传字段，用户自定义内容
-     * @see QNRTCClient#join(String, String, QNJoinResultCallback) 可指定 userData 字段
+     * @param userData 透传字段，用户自定义内容
      */
     @Override
     public void onUserJoined(String remoteUserId, String userData) {
@@ -220,7 +234,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
      * 远端用户 tracks 成功发布时会回调此方法
      *
      * @param remoteUserId 远端用户 userId
-     * @param trackList    远端用户发布的 tracks 列表
+     * @param trackList 远端用户发布的 tracks 列表
      */
     @Override
     public void onUserPublished(String remoteUserId, List<QNTrack> trackList) {
@@ -231,7 +245,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
      * 远端用户 tracks 成功取消发布时会回调此方法
      *
      * @param remoteUserId 远端用户 userId
-     * @param trackList    远端用户取消发布的 tracks 列表
+     * @param trackList 远端用户取消发布的 tracks 列表
      */
     @Override
     public void onUserUnpublished(String remoteUserId, List<QNTrack> trackList) {
@@ -248,7 +262,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
      * 成功订阅远端用户的 tracks 时会回调此方法
      *
      * @param remoteUserId 远端用户 userId
-     * @param trackList    订阅的远端用户 tracks 列表
+     * @param trackList 订阅的远端用户 tracks 列表
      */
     @Override
     public void onSubscribed(String remoteUserId, List<QNTrack> trackList) {
@@ -264,6 +278,11 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         }
     }
 
+    @Override
+    public void onMessageReceived(QNCustomMessage qnCustomMessage) {
+
+    }
+
     /**
      * 当音频路由发生变化时会回调此方法
      *
@@ -277,7 +296,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
     /**
      * 系统相机出错时会触发此回调
      *
-     * @param errorCode    错误码
+     * @param errorCode 错误码
      * @param errorMessage 错误原因
      */
     @Override
@@ -331,6 +350,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
     public void clickSwitchCamera(View view) {
         final ImageButton button = (ImageButton) view;
+
         // 切换摄像头
         QNRTC.switchCamera(new QNCameraSwitchResultCallback() {
             @Override
@@ -345,6 +365,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
             @Override
             public void onCameraSwitchError(String errorMessage) {
+
             }
         });
     }
@@ -356,4 +377,64 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         QNRTC.deinit();
         finish();
     }
+
+    private static class ClientPcmRecorder {
+
+        private QNRTCClient client;
+        private String dstPath = null;
+        private File pcmFile = null;
+        private BufferedOutputStream bos = null;
+        private QNAudioFrameListener listener = new QNAudioFrameListener() {
+            @Override
+            public void onAudioFrameAvailable(QNAudioFrame audioFrame) {
+                writeAudioData(audioFrame.buffer, audioFrame.size, audioFrame.format.getBitsPerSample(), audioFrame.format.getSampleRate(), audioFrame.format.getChannels());
+            }
+        };
+
+        private ClientPcmRecorder(QNRTCClient client, String dstPath) {
+            this.client = client;
+            this.dstPath = dstPath;
+        }
+
+        public boolean startRecordAudio() {
+            try {
+                pcmFile = new File(dstPath);
+                if (pcmFile.exists()) {
+                    pcmFile.delete();
+                }
+                bos = new BufferedOutputStream(new FileOutputStream(pcmFile));
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+                bos = null;
+                pcmFile = null;
+                return false;
+            }
+            client.addAllAudioDataMixedListener(listener);
+            return true;
+        }
+
+        public void stopAudioRecord() {
+            client.removeAllAudioDataMixedListener(listener);
+            if (bos != null) {
+                try {
+                    bos.flush();
+                    bos.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            bos = null;
+            pcmFile = null;
+        }
+
+        private void writeAudioData(ByteBuffer audioData, int size, int bitsPerSample, int sampleRate, int numberOfChannels) {
+            try {
+                Log.d(TAG, "client pcm recording --> size="+size + ",bitsPerSample="+bitsPerSample + ",sampleRate=" + sampleRate + ",numberOfChannels="+numberOfChannels);
+                bos.write(audioData.array(), 0, size);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
 }
