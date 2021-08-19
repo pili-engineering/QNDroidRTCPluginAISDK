@@ -947,6 +947,8 @@ class QNIDCardDetect {
     class ImageResultDTO {
         // 框坐标，格式为 [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]
         java.util.List<java.util.List<Integer>> idCardBox // ??? 为什么用数组的数组
+        String  idcard	;	//身份证区域图片，使用Base64 编码后的字符串， 是否返回由请求参数ret_image 决定
+        String  portrait ;//	身份证人像照片，使用Base64 编码后的字符串， 是否返回由请求参数ret_portrait 决定
     }
 
     class OCRResultDTO {
@@ -996,7 +998,7 @@ interface QNFaceFlashLiveCallback {
 
 //光线活体结果
 class QNFaceFlashLive {
-    int score      //检测分数
+    double score      //检测分数
     int passNum    //视频中通过的人脸帧数
     int faceNum    //视频中检测到的人脸帧数
     int errorCode
