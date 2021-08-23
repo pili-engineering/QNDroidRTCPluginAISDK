@@ -139,6 +139,8 @@ class QnTrackAlDemo : Fragment() {
              * @param idCardDetect 身份证数据
              */
             {
+                it.imageResult.idcard=""
+                it.imageResult.portrait=" N5"
                 tvText.text = Json.encode(it)
             }
         }
@@ -197,13 +199,6 @@ class QnTrackAlDemo : Fragment() {
                 play(it)
             }
             etTTS.setText("")
-        }
-
-        swithCamere.setOnClickListener {
-            QNRTC.switchCamera(object : QNCameraSwitchResultCallback {
-                override fun onCameraSwitchDone(p0: Boolean) {}
-                override fun onCameraSwitchError(p0: String?) {}
-            })
         }
     }
 
