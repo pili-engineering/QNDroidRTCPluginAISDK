@@ -18,6 +18,7 @@ import com.qiniu.droid.rtc.QNRTC
 import com.qiniu.droid.rtc.QNTrack
 import com.qiniu.droid.rtc.ai.*
 import com.qiniu.droid.rtc.ai.audio.QNAudioToText
+import com.qiniu.droid.rtc.ai.audio.QNAudioToTextParam
 import com.qiniu.droid.rtc.ai.faceCompare.QNFaceCompareParam
 import com.qiniu.droid.rtc.ai.faceDetect.QNFaceDetectParam
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActAction
@@ -53,7 +54,9 @@ class QnTrackAlDemo : Fragment() {
             if (isChecked) {
                 mQNAudioToTextAnalyzer = QNAudioToTextAnalyzer.start(
                     localAudioTrack,
-                    null,
+                    QNAudioToTextParam().apply {
+                        hotWords="测试,1;确认,1"
+                    },
                     object :
                         QNAudioToTextAnalyzer.QNAudioToTextCallback {
                         /**
@@ -139,6 +142,8 @@ class QnTrackAlDemo : Fragment() {
              * @param idCardDetect 身份证数据
              */
             {
+                it.imageResult.idcard=""
+                it.imageResult.portrait=" N5"
                 tvText.text = Json.encode(it)
             }
         }
@@ -197,13 +202,6 @@ class QnTrackAlDemo : Fragment() {
                 play(it)
             }
             etTTS.setText("")
-        }
-
-        swithCamere.setOnClickListener {
-            QNRTC.switchCamera(object : QNCameraSwitchResultCallback {
-                override fun onCameraSwitchDone(p0: Boolean) {}
-                override fun onCameraSwitchError(p0: String?) {}
-            })
         }
     }
 

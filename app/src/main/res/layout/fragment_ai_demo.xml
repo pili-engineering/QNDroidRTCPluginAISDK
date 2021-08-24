@@ -90,14 +90,6 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btFaceDetect" />
 
-    <Button
-        android:id="@+id/swithCamere"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="200dp"
-        android:text="切换摄像头"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
 
 
     <LinearLayout
@@ -172,6 +164,7 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <Switch
+        android:visibility="gone"
         android:id="@+id/mRtcRecorderBtn"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
