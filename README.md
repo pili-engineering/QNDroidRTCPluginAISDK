@@ -421,6 +421,8 @@ class QNAudioToTextParam {
     int	needVad     // 是否需要vad;0->关闭;1->开启; 默认1
     int	needWords   // 是否返回词语的对齐信息，1->返回， 0->不返回;默认0。
     double vadSilThres // vad断句的累积时间，大于等于0， 如果设置为0，或者没设置，系统默认
+    String hotWords //  提供热词，格式为: hot_words=热词1,因子1;热词2,因子2，每个热词由热词本身和方法因子以英文逗号隔开，不同热词通过;隔开，最多100个热词，每个热词40字节以内。由于潜在的http服务对url大小的限制，以实际支持的热词个数为准 因子范围[-10,10], 正数代表权重权重越高，权重越高越容易识别成这个词，建议设置1 ，负数代表不想识别
+
 }
 
 // 实时语音转文字回调
@@ -604,6 +606,7 @@ class QNIDCardDetectParam {
     String	refSide     // 当图片中同时存在身份证正反面时，通过该参数指定识别的版面:取值'Any' - 识别人像面或国徽面，'F' - 仅 识别人像面，'B' - 仅识别国徽面
     boolean	retImage    // 是否返回识别后的切图(切图是指精确剪裁对齐后的身份证正反面图片)，返回格式为 JPEG 格式二进制图片使用 base64 编码后的字符串
     boolean	retPortrait // 是否返回身份证(人像面)的人脸图 片，返回格式为 JPEG 格式二进制图片使用 base64 编码后的字符串
+    Boolean isMirror = true  //当前图片是不是镜像,在没有调整的情况下 通常前置摄像头是镜像图片,后置摄像头不是,默认镜像
 }
 
 // 身份证识别结果回调
@@ -619,8 +622,9 @@ class QNIDCardDetect {
     QNIDCardDetect.OCRResultDTO	ocrResult // 文字识别结果
 
     class ImageResultDTO {
-        // 框坐标，格式为 [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]
-        java.util.List<java.util.List<Integer>> idCardBox // ??? 为什么用数组的数组
+        java.util.List<java.util.List<Integer>> idCardBox  // 框坐标，格式为 [[x0, y0], [x1, y1], [x2, y2], [x3, y3]]
+        String  idcard	;	//身份证区域图片，使用Base64 编码后的字符串， 是否返回由请求参数ret_image 决定
+        String  portrait ;//	身份证人像照片，使用Base64 编码后的字符串， 是否返回由请求参数ret_portrait 决定
     }
 
     class OCRResultDTO {
@@ -1043,6 +1047,7 @@ class QNTTSParam {
     int sampleRate = 16000         //合成⾳频的采样率，默认为16000，可选的包括8000，16000， 24000，48000
     int volume = 50                //⾳量⼤⼩，取值范围为0~100，默认为50
     int speed = 0                  //语速，取值范围为-100~100，默认为0
+    String voice_id = ""           //语音ID 可空
 }
 
 //文字转语音声效枚举
