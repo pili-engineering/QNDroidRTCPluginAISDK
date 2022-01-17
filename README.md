@@ -1017,7 +1017,6 @@ faceFlashLiveDetector.commit {
      //todo 拿到结果 判断分数是否满足
 }
 
-
 ```
 
 ### 文字转语音
@@ -1088,6 +1087,90 @@ QNTextToSpeakAnalyzer.run(param) {
 ```
 
 
+
+### 权威人脸对比
+```java
+
+public class QNAuthoritativeFaceComparer {
+
+    //开始一次权威人脸
+    static void run(QNTrack videoTrack, QNAuthoritativeFaceParam param, QNAuthoritativeFaceComparerCallback callback);
+
+}
+
+//权威人脸对比参数
+class QNAuthoritativeFaceParam {
+    String   realName;//真实名字
+    String   idCard; //身份证号码
+}
+
+//权威人脸对比结果
+class QNAuthoritativeFace {
+    String sessionID; 
+    int errorCode;
+    String errorMsg;
+    double similarity; //相似度
+}
+
+//权威人脸结果回调   
+interface QNAuthoritativeFaceComparerCallback {
+        void onResult(QNAuthoritativeFace authoritativeFace);
+}
+
+```
+
+
+### 活体动作识别加权威人脸对比
+```java
+class QNAuthorityActionFaceComparer{
+    //开一次动作活体加权威人脸对比
+    //videoTrack - 视频轨道；faceActionParam - 活体检测参数；authoritativeFaceParam - 权威人脸对比参数；
+    static QNAuthorityActionFaceComparer start(QNTrack videoTrack, QNFaceActionLiveParams faceActionParam,QNAuthoritativeFaceParam authoritativeFaceParam) // 开始活体动作检测
+    void commit(QNAuthorityActionFaceComparerCallback callback) // 动作结束提交获取识别结果
+    void cancel() // 取消
+}
+
+//结果回调
+interface QNAuthorityActionFaceComparerCallback{
+     void onResult(QNFaceActionLive faceActLive,QNAuthoritativeFace authoritativeFace);
+}
+
+```
+
+
+
+### orc
+```java
+class QNOCRDetector {
+
+     //开始一次 ocr 识别
+    static void run(QNTrack videoTrack, QNOCRDetectorCallback callback) 
+
+}
+
+interface QNOCRDetectorCallback {
+        onResult(OCRDetect ocrDetect);
+}
+
+//orc结果
+public class OCRDetect {
+
+    int code;
+    String message;
+    List<Data> data;  
+
+    static class Data {
+        int line;                 //行数
+        List<List<Integer>> bbox; //坐标
+        String text;              //文本 
+        double score;             //分数
+    }
+}
+```
+
+
+
+
 ### 错误码
 
 ```c
@@ -1154,6 +1237,23 @@ QNTextToSpeakAnalyzer.run(param) {
 101        请求参数不合法，⽐如合成⽂本过⻓
 102        服务不可⽤
 103        语⾳合成错误
+
+//权威人脸
+
+55060001	ERROR_PARAMETER_INVALID	请求字段有非法传输
+55060004	FACE_DETECT_FAILED	高清照人脸检测失败
+55060006	FEATURE_EXTRACT_FAILED	人脸特征提取失败
+55060019	IMAGE_BASE64_DECODE_FAILED	人脸检测图片 Base64 解码失败
+55060029	FACE_IDENTIFY_FAILED	人脸鉴别失败
+55060044	REALNAME_FORMAT_ERROR	姓名格式不正确
+55060045	IDCARD_NUMBER_ERROR	身份证号码有误
+55060046	PHOTO_SIZE_NOT_SUITABLE	照片大小不在1kb-30kb的范围内
+55060047	AUTH_INFORMATION_NOT_EXISTED	认证信息不存在
+55060048	IDCARD_PHOTO_NOT_EXISTED	证件照不存在
+55060049	PHOTO_NOT_ACCEPTED	照片质量检验不合格
+55060050	PHOTO_MULTIFACE_DETECTED	照片出现多张人脸
+
+
 
 
 ```
