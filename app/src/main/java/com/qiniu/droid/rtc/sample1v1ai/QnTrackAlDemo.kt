@@ -13,12 +13,10 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.hapi.mediapicker.ImagePickCallback
 import com.hapi.mediapicker.PicPickHelper
-import com.qiniu.droid.rtc.QNCameraSwitchResultCallback
-import com.qiniu.droid.rtc.QNRTC
 import com.qiniu.droid.rtc.QNTrack
 import com.qiniu.droid.rtc.ai.*
 import com.qiniu.droid.rtc.ai.audio.QNAudioToText
-import com.qiniu.droid.rtc.ai.audio.QNAudioToTextParam
+import com.qiniu.droid.rtc.ai.authoritativeFace.QNAuthoritativeFaceParam
 import com.qiniu.droid.rtc.ai.faceCompare.QNFaceCompareParam
 import com.qiniu.droid.rtc.ai.faceDetect.QNFaceDetectParam
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActAction
@@ -54,9 +52,10 @@ class QnTrackAlDemo : Fragment() {
             if (isChecked) {
                 mQNAudioToTextAnalyzer = QNAudioToTextAnalyzer.start(
                     localAudioTrack,
-                    QNAudioToTextParam().apply {
-                        hotWords="测试,1;确认,1"
-                    },
+//                    QNAudioToTextParam().apply {
+//                                               hotWords="清楚,1;sdasd,2"
+//                    },
+                    null,
                     object :
                         QNAudioToTextAnalyzer.QNAudioToTextCallback {
                         /**
@@ -135,15 +134,18 @@ class QnTrackAlDemo : Fragment() {
 
         btOCR.setOnClickListener {
             QNIDCardDetector.run(
-                localVideoTrack, QNIDCardDetectParam()
+                localVideoTrack, QNIDCardDetectParam().apply {
+                    retPortrait = true
+                    retImage = true
+                }
             )
             /**
              * 结果回调
              * @param idCardDetect 身份证数据
              */
             {
-                it.imageResult.idcard=""
-                it.imageResult.portrait=" N5"
+                it.imageResult.idcard = ""
+                it.imageResult.portrait = ""
                 tvText.text = Json.encode(it)
             }
         }
@@ -203,6 +205,72 @@ class QnTrackAlDemo : Fragment() {
             }
             etTTS.setText("")
         }
+
+        btQNAuthoriteActionFaceComparer.setOnClickListener {
+            var invokeCall: (name: String, idcard: String) -> Unit = { name, idcard ->
+                val tip = "请摇摇头"
+                btQNAuthoriteActionFaceComparer.isClickable = false
+                tip.asToast()
+                tvTip.text = "${tip} 3"
+                tvTip.visibility = View.VISIBLE
+                val param = QNFaceActLiveParam()
+                param.actionTypes = listOf(QNFaceActAction.SHAKE)
+                val qnAuthoriteActionFaceComparer =
+                    QNAuthorityActionFaceComparer.start(localVideoTrack, param,
+                        QNAuthoritativeFaceParam().apply {
+                            realName = name
+                            idCard = idcard
+                        }
+                    )
+                GlobalScope.launch(Dispatchers.Main) {
+                    tvTip.text = "${tip} 2"
+                    delay(1000)
+                    tvTip.text = "${tip} 1"
+                    delay(800)
+                    tvTip.text = ""
+                    btQNAuthoriteActionFaceComparer.isClickable = true
+                    Log.d("faceLive", "faceLive start")
+                    qnAuthoriteActionFaceComparer.commit { faceActLive, authoritativeFace ->
+                        faceActLive.bestFrames?.forEach {
+                            it.imageB64 = "。。"
+                        }
+                        Log.d("faceLive", "faceLive stop")
+                        tvText.text =
+                            Json.encode(faceActLive) + "\n" + Json.encode(authoritativeFace)
+                    }
+                }
+            }
+            InputIdcardDialog().apply {
+                call = { name, idcard ->
+                    invokeCall.invoke(name, idcard)
+                }
+
+            }.show(childFragmentManager, "")
+        }
+
+        btnQWFace.setOnClickListener {
+            var invokeCall: (name: String, idcard: String) -> Unit = { name, idcard ->
+                QNAuthoritativeFaceComparer.run(localVideoTrack, QNAuthoritativeFaceParam().apply {
+                    realName = name
+                    idCard = idcard
+                }
+                ) {
+                    tvText.text = Json.encode(it)
+                }
+            }
+            InputIdcardDialog().apply {
+                call = { name, idcard ->
+                    invokeCall.invoke(name, idcard)
+                }
+            }.show(childFragmentManager, "")
+        }
+
+        btorc.setOnClickListener {
+            QNOCRDetector.run(localVideoTrack, QNOCRDetector.QNOCRDetectorCallback {
+                tvText.text = Json.encode(it)
+            })
+
+        }
     }
 
     private fun faceLive(bt: Button, tip: String, faceActAction: QNFaceActAction) {
@@ -214,16 +282,18 @@ class QnTrackAlDemo : Fragment() {
         param.actionTypes = listOf(faceActAction)
         val qnFaceActionLiveDetector = QNFaceActionLiveDetector.start(localVideoTrack, param)
         GlobalScope.launch(Dispatchers.Main) {
-            delay(1000)
             tvTip.text = "${tip} 2"
             delay(1000)
             tvTip.text = "${tip} 1"
-            delay(1000)
+            delay(800)
+            tvTip.text = ""
             bt.isClickable = true
+            Log.d("faceLive", "faceLive start")
             qnFaceActionLiveDetector.commit {
                 it.bestFrames?.forEach {
                     it.imageB64 = "。。"
                 }
+                Log.d("faceLive", "faceLive stop")
                 tvText.text = Json.encode(it)
             }
         }

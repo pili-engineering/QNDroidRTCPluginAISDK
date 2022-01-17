@@ -30,6 +30,7 @@ import com.qiniu.droid.rtc.QNRTCSetting;
 import com.qiniu.droid.rtc.QNSurfaceView;
 import com.qiniu.droid.rtc.QNTrack;
 import com.qiniu.droid.rtc.QNVideoFormat;
+
 import com.qiniu.droid.rtc.model.QNAudioDevice;
 
 import java.io.BufferedOutputStream;
@@ -138,9 +139,8 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         transaction.replace(R.id.flCover, flCover);
         transaction.commit();
 
-
         QNTrack track = QNRTC.createCustomAudioTrack();
-
+        
     }
 
     @Override
