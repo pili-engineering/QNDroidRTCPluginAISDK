@@ -21,6 +21,7 @@ import com.qiniu.droid.rtc.ai.faceCompare.QNFaceCompareParam
 import com.qiniu.droid.rtc.ai.faceDetect.QNFaceDetectParam
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActAction
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActLiveParam
+import com.qiniu.droid.rtc.ai.ocr.OCRDetectParam
 import com.qiniu.droid.rtc.ai.orc.QNIDCardDetectParam
 import com.qiniu.droid.rtc.ai.tts.QNAudioEncoding
 import com.qiniu.droid.rtc.ai.tts.QNTextToSpeak
@@ -266,10 +267,13 @@ class QnTrackAlDemo : Fragment() {
         }
 
         btorc.setOnClickListener {
-            QNOCRDetector.run(localVideoTrack, QNOCRDetector.QNOCRDetectorCallback {
+            QNOCRDetector.run(localVideoTrack, OCRDetectParam().apply {
+                // 当前图片是不是镜像
+                // 在没有调整的情况下 通常前置摄像头是镜像图片,后置摄像头不是
+                isMirror =true
+            }, QNOCRDetector.QNOCRDetectorCallback {
                 tvText.text = Json.encode(it)
             })
-
         }
     }
 
