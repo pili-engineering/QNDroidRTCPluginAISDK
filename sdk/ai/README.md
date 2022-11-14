@@ -280,35 +280,10 @@ class QNAudioToTextAnalyzer {
     void stop();
 }
 
-//文字转语音参数
-class QNTTSParam {
-    String content; //需要进行语音合成的文本内容，最短1个字
-    /**
-     * TTS 发音人标识音源 id 0-6,实际可用范围根据情况, 可以不设置,默认是 0;
-     * 0：女声（柔和）；
-     * 1，女声（正式）；
-     * 2，女生（柔和带正式）；
-     * 3：男声（柔和），
-     * 4：男声（柔和带正式）；
-     * 5：男声（闽南话）；
-     * 6：女生（闽南话）。
-     */
-    int spkID = 0;
-    /**
-     * 可不填，不填时默认为 3。
-     * audioType=3 返回 16K 采样率的 mp3
-     * audioType=4 返回 8K 采样率的 mp3
-     * audioType=5 返回 24K 采样率的 mp3
-     * audioType=6 返回 48k采样率的mp3
-     * audioType=7 返回 16K 采样率的 pcm 格式
-     * audioType=8 返回 8K 采样率的 pcm 格式
-     * audioType=9 返回 24k 采样率的pcm格式
-     * audioType=10 返回 8K 采样率的 wav 格式
-     * audioType=11 返回 16K 采样率的 wav 格式
-     */
-    int audioType = 3;
-    double volume = 1;  // 音量大小，取值范围为 0.75 - 1.25，默认为1
-    double speed = 1;   //语速，取值范围为 0.75 - 1.25，默认为1
+//实时语音转文字参数
+class QNAudioToTextParam {
+     int modelType = 1;     //识别语言，中文: 1, 英文: 2, 中英混合: 0; 默认 1
+     String keyWords = "";  //识别关键字; 相同读音时优先识别为关键字。每个词 2-4 个字, 不同词用 , 分割
 }
 
 // 实时语音转文字回调
