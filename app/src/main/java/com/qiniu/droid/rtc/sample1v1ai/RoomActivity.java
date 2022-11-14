@@ -1,9 +1,12 @@
 package com.qiniu.droid.rtc.sample1v1ai;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.res.Resources;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageButton;
 import android.widget.Toast;
@@ -42,10 +45,11 @@ import java.nio.ByteBuffer;
 import java.util.List;
 
 public class RoomActivity extends AppCompatActivity implements QNRTCEventListener, QNClientEventListener {
-    private static final String TAG = "RoomActivity";
+    public static final String TAG = "RoomActivity";
     private static final String TAG_CAMERA = "camera";
     private static final String TAG_MICROPHONE = "microphone";
-
+    public static final String TAG_SCREEN = "screenshare";
+    private QNSurfaceView screenShareView;
     private QNSurfaceView mLocalVideoSurfaceView;
     private QNSurfaceView mRemoteVideoSurfaceView;
     private QNRTCSetting mSetting;
@@ -58,6 +62,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
     private boolean mIsVideoUnpublished = false;
     private boolean mIsAudioUnpublished = false;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -67,6 +72,15 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         mLocalVideoSurfaceView = findViewById(R.id.local_video_surface_view);
         mRemoteVideoSurfaceView = findViewById(R.id.remote_video_surface_view);
         mRemoteVideoSurfaceView.setZOrderOnTop(true);// QNSurfaceView 是 SurfaceView 的子类, 会受层级影响
+
+        screenShareView = findViewById(R.id.screen_surface_view);
+
+        ViewGroup.LayoutParams lp = screenShareView.getLayoutParams();
+        lp.width = getScreenWidth() / 4;
+        lp.height = getScreenHeight() / 4;
+        screenShareView.setLayoutParams(lp);
+
+        screenShareView.setZOrderOnTop(true);
 
         Intent intent = getIntent();
         mRoomToken = intent.getStringExtra("roomToken");
@@ -139,8 +153,12 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
         transaction.replace(R.id.flCover, flCover);
         transaction.commit();
 
-        QNTrack track = QNRTC.createCustomAudioTrack();
-        
+        RecorderDemo recorderDemo = new RecorderDemo();
+        recorderDemo.client = mClient;
+        FragmentTransaction transaction2 = getSupportFragmentManager().beginTransaction();
+        transaction2.replace(R.id.flCover2, recorderDemo);
+        transaction2.commit();
+
     }
 
     @Override
@@ -153,6 +171,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
     /**
      * 房间状态改变时会回调此方法
      * 房间状态回调只需要做提示用户，或者更新相关 UI； 不需要再做加入房间或者重新发布等其他操作！
+     *
      * @param state 房间状态，可参考 {@link QNConnectionState}
      */
     @Override
@@ -191,10 +210,10 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
     /**
      * 远端用户加入房间时会回调此方法
-     * @see QNRTCClient#join(String, String, QNJoinResultCallback) 可指定 userData 字段
      *
      * @param remoteUserId 远端用户的 userId
-     * @param userData 透传字段，用户自定义内容
+     * @param userData     透传字段，用户自定义内容
+     * @see QNRTCClient#join(String, String, QNJoinResultCallback) 可指定 userData 字段
      */
     @Override
     public void onUserJoined(String remoteUserId, String userData) {
@@ -235,7 +254,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
      * 远端用户 tracks 成功发布时会回调此方法
      *
      * @param remoteUserId 远端用户 userId
-     * @param trackList 远端用户发布的 tracks 列表
+     * @param trackList    远端用户发布的 tracks 列表
      */
     @Override
     public void onUserPublished(String remoteUserId, List<QNTrack> trackList) {
@@ -246,7 +265,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
      * 远端用户 tracks 成功取消发布时会回调此方法
      *
      * @param remoteUserId 远端用户 userId
-     * @param trackList 远端用户取消发布的 tracks 列表
+     * @param trackList    远端用户取消发布的 tracks 列表
      */
     @Override
     public void onUserUnpublished(String remoteUserId, List<QNTrack> trackList) {
@@ -256,6 +275,10 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
                 // 当远端视频取消发布时隐藏远端窗口
                 mRemoteVideoSurfaceView.setVisibility(View.GONE);
             }
+            if (TAG_SCREEN.equals(track.getTag())) {
+                //  当远端视频取消发布时隐藏远端窗口
+                screenShareView.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -263,7 +286,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
      * 成功订阅远端用户的 tracks 时会回调此方法
      *
      * @param remoteUserId 远端用户 userId
-     * @param trackList 订阅的远端用户 tracks 列表
+     * @param trackList    订阅的远端用户 tracks 列表
      */
     @Override
     public void onSubscribed(String remoteUserId, List<QNTrack> trackList) {
@@ -275,6 +298,11 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
                 track.play(mRemoteVideoSurfaceView);
                 // 成功订阅后显示远端窗口
                 mRemoteVideoSurfaceView.setVisibility(View.VISIBLE);
+            }
+            if (TAG_SCREEN.equals(track.getTag())) {
+                // 设置渲染窗口
+                track.play(screenShareView);
+                screenShareView.setVisibility(View.VISIBLE);
             }
         }
     }
@@ -297,7 +325,7 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
     /**
      * 系统相机出错时会触发此回调
      *
-     * @param errorCode 错误码
+     * @param errorCode    错误码
      * @param errorMessage 错误原因
      */
     @Override
@@ -430,12 +458,22 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
         private void writeAudioData(ByteBuffer audioData, int size, int bitsPerSample, int sampleRate, int numberOfChannels) {
             try {
-                Log.d(TAG, "client pcm recording --> size="+size + ",bitsPerSample="+bitsPerSample + ",sampleRate=" + sampleRate + ",numberOfChannels="+numberOfChannels);
+                Log.d(TAG, "client pcm recording --> size=" + size + ",bitsPerSample=" + bitsPerSample + ",sampleRate=" + sampleRate + ",numberOfChannels=" + numberOfChannels);
                 bos.write(audioData.array(), 0, size);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
+    }
+
+    public static int getScreenWidth() {
+        //  int newW = (w/32)*32;
+        return Resources.getSystem().getDisplayMetrics().widthPixels / 32 * 32;
+    }
+
+    public static int getScreenHeight() {
+        //  int newH = (h/32)*32;
+        return Resources.getSystem().getDisplayMetrics().heightPixels / 32 * 32;
     }
 
 }
