@@ -17,6 +17,12 @@
         android:layout_height="200dp"
         android:layout_gravity="start" />
 
+    <com.qiniu.droid.rtc.QNSurfaceView
+        android:id="@+id/screen_surface_view"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        />
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -74,6 +80,10 @@
 
     <FrameLayout
         android:id="@+id/flCover"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"/>
+    <FrameLayout
+        android:id="@+id/flCover2"
         android:layout_width="match_parent"
         android:layout_height="match_parent"/>
 </FrameLayout>

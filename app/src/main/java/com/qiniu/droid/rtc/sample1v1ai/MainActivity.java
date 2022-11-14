@@ -7,7 +7,9 @@ import android.text.TextUtils;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
+
 import androidx.appcompat.app.AppCompatActivity;
+
 import com.uuzuche.lib_zxing.activity.CaptureActivity;
 import com.uuzuche.lib_zxing.activity.CodeUtils;
 
@@ -15,16 +17,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int QRCODE_RESULT_REQUEST_CODE = 1;
     private EditText mRoomTokenEditText;
-    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:srRQTXJzBogXrXVMq-FUSOdER3c=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjYxNTcxNzAzLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzIiwidXNlcklkIjoiMTIzMzMifQ==";
-    //debug "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:HX9jtooyqlqyq0iN9ERM2H-i1S0=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjI3NzA0NDA0LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzNCIsInVzZXJJZCI6ImFkc2FkYWRhZCJ9"
-    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:yvaLyhyuhN54013ESzodkpxJ0BI=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjYxNTcxNzAzLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzIiwidXNlcklkIjoiMTJlcWUifQ==";
-    // "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:9ifJL3qnKSTAwuA1iPmDuOgnkRY=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNjI3NzA0NDYwLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzNCIsInVzZXJJZCI6ImFkc2Fkc2Fkc2EifQ=="
+    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:xdeb3tEeEGoaf-RV1Ybv7yZmtCA=:eyJhcHBJZCI6ImZsZXFmcTZ5YyIsImV4cGlyZUF0IjoxNjc2MTEyOTI3LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiYWFzMiIsInVzZXJJZCI6ImRzYWRhc2QifQ==";
+    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:09onwzWRNDOp0vO0m_cRDHxYRtM=:eyJhcHBJZCI6ImZsZXFmcTZ5YyIsImV4cGlyZUF0IjoxNjc2MTEyOTI3LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiYWFzMiIsInVzZXJJZCI6ImRzYWQ0MzUzIn0=";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        AISdkManager.INSTANCE.init(this.getApplicationContext());
         mRoomTokenEditText = findViewById(R.id.room_token_edit_text);
 
         findViewById(R.id.buttonToken1).setOnClickListener(new View.OnClickListener() {
