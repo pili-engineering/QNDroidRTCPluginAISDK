@@ -127,7 +127,7 @@ class QnTrackAlDemo : Fragment() {
                     actionFaceComparer.commit { faceActLive ->
                         tvTip.text = ""
                         tvText.text =
-                            faceActLive.errorCode.toString() + " " + faceActLive.errorMsg + " score:" + faceActLive.result?.score
+                            faceActLive.errorCode.toString() + " " + faceActLive.errorMsg +   "actionVerify:" + faceActLive.result?.actionVerify + "" +  " score:" + faceActLive.result?.score
                     }
                 }
             }
