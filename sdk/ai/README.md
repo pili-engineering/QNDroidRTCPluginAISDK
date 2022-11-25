@@ -764,8 +764,8 @@ actionFaceComparer.getRequestCode(
         tvTip.text = "准备动作"
         //对每个动作给两秒提示让用户完成动作
         code.result.faceActions.forEach {
-            delay(2000)
             tvTip.text = it.getTip()
+            delay(2000)
         }
         //提交结果
         actionFaceComparer.commit { faceActLive, authoritativeFace ->

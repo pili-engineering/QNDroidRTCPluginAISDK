@@ -119,9 +119,9 @@ class QnTrackAlDemo : Fragment() {
                     tvTip.text = "准备动作"
                     //对校验码里的每个动作显示提示
                     code.result.faceActions.forEach {
+                        tvTip.text = it.getTip()
                         //等待x秒-用户完成动作
                         delay(2000)
-                        tvTip.text = it.getTip()
                     }
                     //提交获取结果
                     actionFaceComparer.commit { faceActLive ->
