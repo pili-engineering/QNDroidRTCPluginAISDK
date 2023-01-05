@@ -1,7 +1,6 @@
 package com.qiniu.droid.rtc.sample1v1ai
 
 import android.annotation.SuppressLint
-import android.content.res.Resources
 import android.os.Build
 import android.os.Bundle
 import android.os.Environment
@@ -78,9 +77,7 @@ class RecorderDemo : Fragment() {
                             file = filePath
                             Toast.makeText(requireContext(), "开始录制", Toast.LENGTH_SHORT).show()
                         }
-                        /**
-                         * 录制完成
-                         */
+
                         /**
                          * 录制完成
                          */
@@ -93,12 +90,7 @@ class RecorderDemo : Fragment() {
                             Log.d("mjl", "onStop")
                             Toast.makeText(requireContext(), "完成录制", Toast.LENGTH_SHORT).show()
                         }
-                        /**
-                         * 失败
-                         *
-                         * @param code
-                         * @param msg
-                         */
+
                         /**
                          * 失败
                          *

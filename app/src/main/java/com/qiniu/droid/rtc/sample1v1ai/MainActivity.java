@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int QRCODE_RESULT_REQUEST_CODE = 1;
     private EditText mRoomTokenEditText;
-    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:xdeb3tEeEGoaf-RV1Ybv7yZmtCA=:eyJhcHBJZCI6ImZsZXFmcTZ5YyIsImV4cGlyZUF0IjoxNjc2MTEyOTI3LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiYWFzMiIsInVzZXJJZCI6ImRzYWRhc2QifQ==";
-    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:09onwzWRNDOp0vO0m_cRDHxYRtM=:eyJhcHBJZCI6ImZsZXFmcTZ5YyIsImV4cGlyZUF0IjoxNjc2MTEyOTI3LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiYWFzMiIsInVzZXJJZCI6ImRzYWQ0MzUzIn0=";
+    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:FT6IAELdCWHD_DU9wuwyr1CMD90=:eyJhcHBJZCI6ImQ4bGs3bDRlZCIsImV4cGlyZUF0IjoxNzA1NzM4OTQyLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiOTlhYSIsInVzZXJJZCI6InNhZGFzMjM0MjIzNCJ9";
+    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:OiRjPamUfXd1xyrUi7PqHbex-iU=:eyJhcHBJZCI6ImQ4bGs3bDRlZCIsImV4cGlyZUF0IjoxNzA1NzM4OTQyLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiOTlhYSIsInVzZXJJZCI6InNhZGFzMjM0MiJ9";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

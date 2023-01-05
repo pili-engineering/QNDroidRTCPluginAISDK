@@ -28,7 +28,6 @@ import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActAction
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActLiveCode
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActLiveCodeParam
 import com.qiniu.droid.rtc.ai.faceactlive.QNFaceActLiveParam
-import com.qiniu.droid.rtc.ai.ocr.OCRDetectParam
 import com.qiniu.droid.rtc.ai.orc.QNIDCardDetectParam
 import com.qiniu.droid.rtc.ai.tts.QNTextToSpeak
 import com.qiniu.droid.rtc.ai.tts.QNTTSParam
@@ -36,8 +35,6 @@ import com.qiniu.util.Json
 import kotlinx.android.synthetic.main.fragment_ai_demo.*
 import kotlinx.coroutines.*
 import java.io.File
-import java.io.FileOutputStream
-
 
 class QnTrackAlDemo : Fragment() {
 
@@ -61,7 +58,9 @@ class QnTrackAlDemo : Fragment() {
             if (isChecked) {
                 mQNAudioToTextAnalyzer = QNAudioToTextAnalyzer.start(
                     localAudioTrack,
-                    QNAudioToTextParam(), object : QNAudioToTextAnalyzer.QNAudioToTextCallback {
+                    QNAudioToTextParam().apply {
+                        voiceID = System.currentTimeMillis().toString()
+                    }, object : QNAudioToTextAnalyzer.QNAudioToTextCallback {
                         /**
                          * 开始成功
                          */
@@ -127,7 +126,7 @@ class QnTrackAlDemo : Fragment() {
                     actionFaceComparer.commit { faceActLive ->
                         tvTip.text = ""
                         tvText.text =
-                            faceActLive.errorCode.toString() + " " + faceActLive.errorMsg +   "actionVerify:" + faceActLive.result?.actionVerify + "" +  " score:" + faceActLive.result?.score
+                            faceActLive.errorCode.toString() + " " + faceActLive.errorMsg + "actionVerify:" + faceActLive.result?.actionVerify + "" + " score:" + faceActLive.result?.score
                     }
                 }
             }
