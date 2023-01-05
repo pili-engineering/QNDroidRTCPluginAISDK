@@ -468,12 +468,12 @@ public class RoomActivity extends AppCompatActivity implements QNRTCEventListene
 
     public static int getScreenWidth() {
         //  int newW = (w/32)*32;
-        return Resources.getSystem().getDisplayMetrics().widthPixels / 32 * 32;
+        return 720;
     }
 
     public static int getScreenHeight() {
         //  int newH = (h/32)*32;
-        return Resources.getSystem().getDisplayMetrics().heightPixels / 32 * 32;
+        return 1280;
     }
 
 }
