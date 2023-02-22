@@ -41,20 +41,17 @@ object AISdkManager {
     }
 
     private var isInit = false
-    fun init(context: Context) {
+    fun init() {
         if (isInit) {
             return
         }
         isInit = true
         QNRtcAISdkManager.setSignCallback {
-            TokenUtils.signUrlToToken(it)
+            getToken(it).data.signToken
         }
-        GlobalScope.launch(Dispatchers.Main) {
-            val ret = async(Dispatchers.IO) {
-                getToken("")
-            }
-            val token = ret.await()
-            QNRtcAISdkManager.setToken(token.data.aiToken)
-        }
+        Thread {
+            QNRtcAISdkManager.setToken(getToken("").data.aiToken)
+        }.start()
+
     }
 }

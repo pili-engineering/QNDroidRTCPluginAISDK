@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AISdkManager.INSTANCE.init(this.getApplicationContext());
+        AISdkManager.INSTANCE.init();
         mRoomTokenEditText = findViewById(R.id.room_token_edit_text);
 
         findViewById(R.id.buttonToken1).setOnClickListener(new View.OnClickListener() {
