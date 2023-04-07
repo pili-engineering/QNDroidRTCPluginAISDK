@@ -44,7 +44,7 @@
                 android:layout_gravity="center"
                 android:layout_margin="20dp"
                 android:background="#0000"
-                android:onClick="clickPublishVideo"
+                android:onClick="clickMuteVideo"
                 android:src="@mipmap/video_open" />
 
             <ImageButton
@@ -54,7 +54,7 @@
                 android:layout_gravity="center"
                 android:layout_margin="20dp"
                 android:background="#0000"
-                android:onClick="clickPublishAudio"
+                android:onClick="clickMuteAudio"
                 android:src="@mipmap/microphone" />
 
             <ImageButton

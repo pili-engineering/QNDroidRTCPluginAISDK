@@ -24,7 +24,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        AISdkManager.INSTANCE.init();
+        AISdkManager.INSTANCE.init(this.getApplicationContext());
         mRoomTokenEditText = findViewById(R.id.room_token_edit_text);
 
         findViewById(R.id.buttonToken1).setOnClickListener(new View.OnClickListener() {
@@ -45,10 +45,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void joinRoom(View view) {
         // 在进入房间前，必须有相对应的权限，在 Android 6.0 后除了在 Manifest 文件中声明外还需要动态申请权限。
-        if (!isPermissionOK()) {
-            Toast.makeText(this, "Some permissions is not approved !!!", Toast.LENGTH_SHORT).show();
-            return;
-        }
+//        if (!isPermissionOK()) {
+//            Toast.makeText(this, "Some permissions is not approved !!!", Toast.LENGTH_SHORT).show();
+//            return;
+//        }
         if (!TextUtils.isEmpty(mRoomTokenEditText.getText())) {
             Intent intent = new Intent(this, RoomActivity.class);
             intent.putExtra("roomToken", mRoomTokenEditText.getText().toString());

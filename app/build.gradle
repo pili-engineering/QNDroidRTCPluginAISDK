@@ -56,7 +56,7 @@ dependencies {
     implementation project(":sdk:ai")
     implementation project(":sdk:codec")
     implementation project(":sdk:record")
-
+    implementation project(':depends_sdk_qrtc') //七牛rtc
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

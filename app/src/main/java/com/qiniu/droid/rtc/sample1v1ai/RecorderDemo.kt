@@ -11,10 +11,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.qiniu.droid.rtc.QNCustomVideoTrackConfig
-import com.qiniu.droid.rtc.QNRTCClient
-import com.qiniu.droid.rtc.QNTrack
-import com.qiniu.droid.rtc.QNVideoFormat
+import com.qiniu.droid.rtc.*
 import com.qiniu.droid.rtc.ai.core.util.MediaStoreUtils
 import com.qiniu.droid.rtc.sample1v1ai.RoomActivity.getScreenHeight
 import com.qiniu.droid.rtc.sample1v1ai.RoomActivity.getScreenWidth
@@ -25,7 +22,7 @@ import com.qiniu.droid.rtclocalrecord.interfaces.QNScreenShareCallback
 class RecorderDemo : Fragment() {
 
     lateinit var client: QNRTCClient
-    private var mScreenShareTrack: QNTrack? = null
+    private var mScreenShareTrack: QNLocalTrack? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -38,7 +35,9 @@ class RecorderDemo : Fragment() {
     @SuppressLint("SetTextI18n")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
+        QNRTCLocalRecordPlugin.getInstance().setInterruptCallBack {
+            Toast.makeText(requireContext(),"被打断",Toast.LENGTH_LONG).show()
+        }
         val btn = view.findViewById<Button>(R.id.recoder)
 
         btn.setOnClickListener(View.OnClickListener {
@@ -115,16 +114,22 @@ class RecorderDemo : Fragment() {
             if (!btnShare.isSelected()) {
                 //创建共享参数
                 val config = QNCustomVideoTrackConfig(RoomActivity.TAG_SCREEN)
-                    .setVideoEncodeFormat(QNVideoFormat(720, 1280, 20))
-                    .setBitrate(1500)
+                    //.setVideoEncodeFormat(QNVideoFormat(720, 1280, 20))
+                   // .setBitrate(1500)
                 //创建屏幕共享轨道
                 QNRTCLocalRecordPlugin.getInstance().createScreenShareTrack(
                     requireActivity(),
                     config,
                     object : QNScreenShareCallback {
-                        override fun onCreateTrack(screenShareTrack: QNTrack) {
+                        override fun onCreateTrack(screenShareTrack: QNLocalTrack) {
                             mScreenShareTrack = screenShareTrack
-                            client.publish(mScreenShareTrack)
+                            client.publish(object : QNPublishResultCallback {
+                                override fun onPublished() {
+                                }
+
+                                override fun onError(p0: Int, p1: String?) {
+                                }
+                            }, ArrayList<QNLocalTrack>().apply { add(mScreenShareTrack!!) } )
                             btnShare.setSelected(true)
                             btnShare.setText("取消共享")
                         }

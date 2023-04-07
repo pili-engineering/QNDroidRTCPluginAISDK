@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('qdroid-avcodec-1.0.1.aar'))
+artifacts.add("default", file('qdroid-avcodec-1.0.3.aar'))

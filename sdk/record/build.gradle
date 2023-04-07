@@ -1,2 +1,2 @@
 configurations.maybeCreate("default")
-artifacts.add("default", file('qndroid-rtc-localRecord-2.1.0.aar'))
+artifacts.add("default", file('qndroid-rtc-localRecord-2.1.1.aar'))
