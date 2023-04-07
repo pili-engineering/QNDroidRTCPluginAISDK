@@ -11,21 +11,21 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.qiniu.droid.rtc.QNCustomVideoTrackConfig
-import com.qiniu.droid.rtc.QNRTCClient
-import com.qiniu.droid.rtc.QNTrack
-import com.qiniu.droid.rtc.QNVideoFormat
+import com.qiniu.droid.rtc.*
 import com.qiniu.droid.rtc.ai.core.util.MediaStoreUtils
 import com.qiniu.droid.rtc.sample1v1ai.RoomActivity.getScreenHeight
 import com.qiniu.droid.rtc.sample1v1ai.RoomActivity.getScreenWidth
 import com.qiniu.droid.rtclocalrecord.QNRTCLocalRecordPlugin
+import com.qiniu.droid.rtclocalrecord.QNRTCRecordPlugin
 import com.qiniu.droid.rtclocalrecord.interfaces.QNLocalRecorderCallback
 import com.qiniu.droid.rtclocalrecord.interfaces.QNScreenShareCallback
+import com.qiniuavbox.avcapture.screen.ScreenRecordService
+import com.qiniuavbox.avencoder.VideoEncodeParam
 
 class RecorderDemo : Fragment() {
 
     lateinit var client: QNRTCClient
-    private var mScreenShareTrack: QNTrack? = null
+    private var mScreenShareTrack: QNLocalTrack? = null
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -33,6 +33,16 @@ class RecorderDemo : Fragment() {
     ): View {
         val v = inflater.inflate(R.layout.fragment_recorder, container, false)
         return v
+    }
+
+    companion object {
+        const val recordWidth = 720
+        val recordHeight =
+            recordWidth * (ScreenRecordService.screenHeight / ScreenRecordService.screenWidth)
+
+        init {
+            QNRTCRecordPlugin.initScreenCaptureService(recordWidth, recordHeight)
+        }
     }
 
     @SuppressLint("SetTextI18n")
@@ -48,16 +58,18 @@ class RecorderDemo : Fragment() {
             } else {
                 Environment.getExternalStorageDirectory().absolutePath + "/A"
             }
-            if (!btn.isSelected()) {
-                QNRTCLocalRecordPlugin.getInstance().startMediaRecorder(
+            if (!btn.isSelected) {
+                QNRTCRecordPlugin.startMediaRecorder(
                     client,
                     requireActivity(),
                     url,
                     System.currentTimeMillis().toString() + "",
-                    getScreenWidth(),
-                    getScreenHeight(),
-                    15,
-                    1000 * 1000,
+                    VideoEncodeParam(
+                        recordWidth,
+                        recordHeight,
+                        800 * 1000, 15
+                    ),
+
                     object : QNLocalRecorderCallback {
                         private var file = ""
                         /**
@@ -105,7 +117,7 @@ class RecorderDemo : Fragment() {
                         }
                     })
             } else {
-                QNRTCLocalRecordPlugin.getInstance().stopMediaRecorder(requireContext(), client)
+                QNRTCRecordPlugin.stopMediaRecorder(client)
             }
         })
 
@@ -115,31 +127,37 @@ class RecorderDemo : Fragment() {
             if (!btnShare.isSelected()) {
                 //创建共享参数
                 val config = QNCustomVideoTrackConfig(RoomActivity.TAG_SCREEN)
-                    .setVideoEncodeFormat(QNVideoFormat(720, 1280, 20))
-                    .setBitrate(1500)
+                //.setVideoEncodeFormat(QNVideoFormat(720, 1280, 20))
+                // .setBitrate(1500)
                 //创建屏幕共享轨道
-                QNRTCLocalRecordPlugin.getInstance().createScreenShareTrack(
+                QNRTCRecordPlugin.createRTCScreenShareTrack(
                     requireActivity(),
                     config,
                     object : QNScreenShareCallback {
-                        override fun onCreateTrack(screenShareTrack: QNTrack) {
+                        override fun onCreateTrack(screenShareTrack: QNLocalTrack) {
                             mScreenShareTrack = screenShareTrack
-                            client.publish(mScreenShareTrack)
-                            btnShare.setSelected(true)
-                            btnShare.setText("取消共享")
+                            client.publish(object : QNPublishResultCallback {
+                                override fun onPublished() {
+                                }
+
+                                override fun onError(p0: Int, p1: String?) {
+                                }
+                            }, ArrayList<QNLocalTrack>().apply { add(mScreenShareTrack!!) })
+                            btnShare.isSelected = true
+                            btnShare.text = "取消共享"
                         }
 
                         override fun onError(code: Int, msg: String) {
-                            Log.d(RoomActivity.TAG, "屏幕共享轨道场景创建失败")
+                            Log.d("QNRTCRecordPlugin", "屏幕共享轨道场景创建失败")
                         }
                     })
             } else {
-                QNRTCLocalRecordPlugin.getInstance().releaseScreenShareTrack(requireContext())
+                QNRTCRecordPlugin.releaseRTCScreenShareTrack()
                 client.unpublish(mScreenShareTrack)
-                btnShare.setSelected(false)
-                btnShare.setText("屏幕共享")
+                btnShare.isSelected = false
+                btnShare.text = "屏幕共享"
             }
         })
-    }
 
+    }
 }

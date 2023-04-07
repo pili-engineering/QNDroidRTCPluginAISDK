@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.EditText
 import androidx.fragment.app.DialogFragment
-import kotlinx.android.synthetic.main.dialog_input_idcard.*
+
 
 class InputIdcardDialog : DialogFragment() {
 
@@ -21,9 +22,9 @@ class InputIdcardDialog : DialogFragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        btOk.setOnClickListener {
-            val name = etName.text.toString()
-            val card = etIdCard.text.toString()
+        view.findViewById<View>(R.id.btOk).setOnClickListener {
+            val name =  view.findViewById<EditText>(R.id.etName).text.toString()
+            val card =  view.findViewById<EditText>(R.id.etIdCard).text.toString()
             call.invoke(name,card)
             dismiss()
         }

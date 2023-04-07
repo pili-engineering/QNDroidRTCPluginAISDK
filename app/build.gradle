@@ -33,6 +33,9 @@ android {
     lint {
         baseline = file("lint-baseline.xml")
     }
+    viewBinding {
+        enabled = true
+    }
 }
 
 dependencies {
@@ -43,7 +46,7 @@ dependencies {
     }
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
     implementation 'com.github.MJLblabla.hapiMediaPicker:hapimediapicker:1.0.7'
-    implementation files('libs/qndroid-rtc-4.0.1-beta.9.jar')
+
     implementation 'com.qiniu:happy-dns:0.2.17'
     implementation 'com.qiniu:qiniu-java-sdk:7.6.0'
     implementation "org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.1"
@@ -56,7 +59,7 @@ dependencies {
     implementation project(":sdk:ai")
     implementation project(":sdk:codec")
     implementation project(":sdk:record")
-
+    implementation project(':depends_sdk_qrtc') //七牛rtc
     testImplementation 'junit:junit:4.13.2'
     androidTestImplementation 'androidx.test.ext:junit:1.1.3'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0'

@@ -21,3 +21,4 @@ include ':app'
 include(':sdk:ai')
 include(':sdk:codec')
 include(':sdk:record')
+include ':depends_sdk_qrtc' //七牛rtc
