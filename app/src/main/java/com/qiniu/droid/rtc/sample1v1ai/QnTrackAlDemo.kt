@@ -96,8 +96,7 @@ class QnTrackAlDemo : Fragment() {
                          * @param audioToText 当前片段的结果文字数据
                          */
                         override fun onAudioToText(audioToText: QNAudioToText) {
-                            binding.tvText.text =
-                                audioToText.bestTranscription.transcribedText ?: ""
+                            binding.tvText.text = JsonUtils.toJson(audioToText)
                         }
                     })
             } else {
