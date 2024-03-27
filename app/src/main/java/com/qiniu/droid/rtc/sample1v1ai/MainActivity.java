@@ -17,8 +17,8 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int QRCODE_RESULT_REQUEST_CODE = 1;
     private EditText mRoomTokenEditText;
-    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:h2tMZMPdW6Rbih3nbAGxqFl0QzI=:eyJhcHBJZCI6ImZuZjB2cjZnbiIsImV4cGlyZUF0IjoxNzMzOTc0MzQ0LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiYWRzYWQiLCJ1c2VySWQiOiJkc2FkYWQifQ==";
-    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:y9b4TYJbHr2gzaTH45r6mASBm4c=:eyJhcHBJZCI6ImZuZjB2cjZnbiIsImV4cGlyZUF0IjoxNzMzOTc0MzQ0LCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiYWRzYWQiLCJ1c2VySWQiOiJkc2FkYWRkc2RzYWRhIn0=";
+    String token1 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:HZmhytVxpX3YpeP-5wPoTWAeJBU=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNzQxNDIzMzYyLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzMTIzIiwidXNlcklkIjoiMTIzMTIzIn0=";
+    String token2 = "QxZugR8TAhI38AiJ_cptTl3RbzLyca3t-AAiH-Hh:RLxTVoX_IHF90KYey7xY_uWX92s=:eyJhcHBJZCI6ImQ4ZHJlOHcxcCIsImV4cGlyZUF0IjoxNzQxNDIzMzYyLCJwZXJtaXNzaW9uIjoidXNlciIsInJvb21OYW1lIjoiMTIzMTIzIiwidXNlcklkIjoiMTIzMTIzc2FkYXMifQ==";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -26,7 +26,8 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         AISdkManager.INSTANCE.init(this.getApplicationContext());
         mRoomTokenEditText = findViewById(R.id.room_token_edit_text);
-        isPermissionOK();
+
+        new PermissionChecker(this).checkPermission();
         findViewById(R.id.buttonToken1).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

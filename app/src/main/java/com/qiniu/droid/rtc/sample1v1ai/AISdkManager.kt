@@ -3,6 +3,7 @@ package com.qiniu.droid.rtc.sample1v1ai
 import android.content.Context
 import android.text.TextUtils
 import android.util.Log
+import com.qiniu.droid.rtc.ai.ASRConfig
 import com.qiniu.droid.rtc.ai.QNRtcAISdkManager
 import com.qiniu.droid.rtc.ai.core.util.JsonUtils
 import com.qiniu.droid.rtc.sample1v1ai.http.OKHttpManger
@@ -12,6 +13,7 @@ import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 import okhttp3.Request
+import java.util.UUID
 
 object AISdkManager {
 
@@ -46,9 +48,12 @@ object AISdkManager {
             return
         }
         isInit = true
-        QNRtcAISdkManager.setSignCallback {
-           ""// TokenUtils.signUrlToToken(it)
-        }
+
+        QNRtcAISdkManager.setASRParams(ASRConfig().apply {
+            asrAppID = 1
+            asrAppKey = ""
+            asrCUid = "13141616037"
+        })
         GlobalScope.launch(Dispatchers.Main) {
             val ret = async(Dispatchers.IO) {
                 getToken("")

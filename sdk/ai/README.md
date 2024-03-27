@@ -19,17 +19,19 @@ class App : Application() {
     override fun onCreate() {
         //初始化
         QNRtcAISdkManager.init(this)
-        //设置语音识别签名回调
-        QNRtcAISdkManager.setSignCallback { url ->
-            //向接入业务服务器完成url签名
-        }
+        //设置语音识配置
+        QNRtcAISdkManager.setASRParams(ASRConfig().apply {
+            asrAppID = xxx
+            asrAppKey = "xxx"
+            asrCUid = "xxx"
+        })
         //设置aitoken
         QNRtcAISdkManager.setToken("your ai token")
     }
 }
 ```
 
-### aiToken 和url签名
+### aiToken / 语音识配置
 
 #### aiToken
 
@@ -46,11 +48,15 @@ token="QD "+Your_Access_Key+":"+encodedSign+":"+encodedSrc``
 
 涉及到用户_Secret_Key 建议签名逻辑运行在接入方服务器端
 
-### url签名
-
-public String signUrlToToken(String url)中参数为待签名的url（url中已经包含了时间戳）
-[将url签名成token 参考](https://developer.qiniu.com/kodo/1202/download-token)
-涉及到用户_Secret_Key 建议此逻辑房间服务器端 涉及到用户_Secret_Key 建议签名逻辑运行在接入方服务器端
+### 语音识配置
+```
+class ASRConfig {
+     int asrAppID = 0
+     String asrAppKey = ""
+     String asrCUid = ""   //随便填不影响使用。机器的mac或者其它唯一id，页面上计算UV用
+     int devPid = 15372    //识别模型，比如普通话还是英语，是否要加标点等
+}
+```
 
 ## api说明
 
@@ -282,8 +288,7 @@ class QNAudioToTextAnalyzer {
 
 //实时语音转文字参数
 class QNAudioToTextParam {
-     int modelType = 1;     //识别语言，中文: 1, 英文: 2, 中英混合: 0; 默认 1
-     String keyWords = "";  //识别关键字; 相同读音时优先识别为关键字。每个词 2-4 个字, 不同词用 , 分割
+    String voiceID = "" //流ID 用于排查日志
 }
 
 // 实时语音转文字回调
@@ -305,33 +310,14 @@ interface QNAudioToTextCallback {
 // 语音识别结果
 // 当前片段的结果文字数据
 class QNAudioToText {
-    boolean isFinal;    //此识别结果是否为最终结果
-    boolean isBegin;    //此识别结果是否为第一片
-    BestTranscription bestTranscription; //最好的转写候选
-
-    //最好的转写候选
-    static class BestTranscription {
-        String transcribedText;  //转写结果
-        int beginTimestamp;      //句子的开始时间, 单位毫秒
-        int endTimestamp;        //句子的结束时间, 单位毫秒
-        List<KeyWordsType> keyWordsType; //转写结果中包含KeyWords内容
-        List<Piece> piece;       //转写结果的分解（只对final状态结果有效，返回每个字及标点的详细信息）
-
-        //结果中包含KeyWords
-        static class KeyWordsType {
-            String keyWords;      //命中的关键词KeyWords。返回不多于10个。
-            double keyWordsScore; //命中的关键词KeyWords相应的分数。分数越高表示和关键词越相似，对应kws中的分数。
-            int startTimestamp;   //关键词开始时间, 单位毫秒
-            int endTimestamp;     //关键词结束时间, 单位毫秒
-        }
-
-        //转写结果的分解（只对final状态结果有效，返回每个字及标点的详细信息）
-        static class Piece {
-            String transcribedText;  //转写分解结果
-            int beginTimestamp;      //分解开始时间(音频开始时间为0), 单位毫秒
-            int endTimestamp;        //分解结束时间(音频开始时间为0), 单位毫秒
-        }
-    }
+     String type       //MID_TEXT：一句话以及临时识别结果  ；FIN_TEXT：一句话的最终识别结果或者报错， 是否报错由err_no判断
+     String result     //音频的识别结果
+     int start_time    //一句话的开始时间，临时识别结果MID_TEXT 无此字段
+     int end_time      //一句话的结束时间，临时识别结果MID_TEXT 无此字段
+     int err_no        //表示正确， 其它错误码见文末
+     String err_msg    //err_no!=0时，具体的报错解释
+     int log_id        //日志id，用这个id可以百度服务端定位请求，排查问题
+     String sn         //用这个sn可以百度服务端定位请求，排查问题。ws URI里的参数及识别句子的组合
 }
 ```
 
@@ -764,8 +750,8 @@ actionFaceComparer.getRequestCode(
         tvTip.text = "准备动作"
         //对每个动作给两秒提示让用户完成动作
         code.result.faceActions.forEach {
-            tvTip.text = it.getTip()
             delay(2000)
+            tvTip.text = it.getTip()
         }
         //提交结果
         actionFaceComparer.commit { faceActLive, authoritativeFace ->
@@ -875,4 +861,71 @@ class QNRtcAISdkManager {
 //语音转文字:
 2000	网络异常连接中断
 
+//身份证识别:
+53090001	请求解析失败
+53090002	图片解码错误
+53090003	OCR 内部错误
+53090004	无法识别的身份证(非中国身份证等)
+53090005	参数错误
+55060030	鉴权失败
+53091001	黑白复印件
+53091003	无法检测到人脸
+53091004	证件信息缺失或错误
+53091005	证件过期
+53091006	身份证不完整
+
+//人脸检测:
+55060001	请求字段有非法传输
+55060002	图片解码失败
+55060006	人脸特征提取失败
+55060018	人脸配准失败
+55060019	人脸检测图片 Base64 解码失败
+55060033	人脸图片无效
+
+//人脸对比:
+55060001	请求字段有非法传输
+55060002	图片解码失败
+55060028	人脸比对图片 A Base64 解码失败
+55060029	人脸比对图片 B Base64 解码失败
+55060040	图片A人脸检测失败
+55060041	图片B人脸检测失败
+
+// 动作活体检测:
+55060001	请求字段有非法传输
+55060002	图片解码失败
+55060012	点头动作检测失败
+55060013	摇头动作检测失败
+55060014	眨眼动作检测失败
+55060015	张嘴动作检测失败
+55060016	不是活体
+55060024	视频帧率过低
+55060016	动作类型无效
+
+//光线活体
+55060001    请求字段有非法传输
+55060002	图片解码失败
+55060009	视频无效
+55060011	视频中人脸检测失败
+55060016	不是活体
+
+//文转音
+100        请求参数缺失
+101        请求参数不合法，⽐如合成⽂本过⻓
+102        服务不可⽤
+103        语⾳合成错误
+
+//权威人脸
+
+55060001	ERROR_PARAMETER_INVALID	请求字段有非法传输
+55060004	FACE_DETECT_FAILED	高清照人脸检测失败
+55060006	FEATURE_EXTRACT_FAILED	人脸特征提取失败
+55060019	IMAGE_BASE64_DECODE_FAILED	人脸检测图片 Base64 解码失败
+55060029	FACE_IDENTIFY_FAILED	人脸鉴别失败
+55060044	REALNAME_FORMAT_ERROR	姓名格式不正确
+55060045	IDCARD_NUMBER_ERROR	身份证号码有误
+55060046	PHOTO_SIZE_NOT_SUITABLE	照片大小不在1kb-30kb的范围内
+55060047	AUTH_INFORMATION_NOT_EXISTED	认证信息不存在
+55060048	IDCARD_PHOTO_NOT_EXISTED	证件照不存在
+55060049	PHOTO_NOT_ACCEPTED	照片质量检验不合格
+55060050	PHOTO_MULTIFACE_DETECTED	照片出现多张人脸
 ```
